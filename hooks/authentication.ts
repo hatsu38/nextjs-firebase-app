@@ -1,28 +1,39 @@
 import firebase from 'firebase/app'
+import { useEffect } from 'react'
+import { User } from '../modules/User'
+import { atom, useRecoilState } from 'recoil'
 
-function authenticate() {
-  firebase
-    .auth()
-    .signInAnonymously()
-    .catch(function (error) {
-      // Handle Errors here.
-      var errorCode = error.code
-      var errorMessage = error.message
-      // ...
-    })
+const userState = atom<User>({
+  key: 'user',
+  default: null,
+})
 
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-      console.log(user.uid)
-      console.log(user.isAnonymous)
-    } else {
-      // User is signed out.
-      // ...
+export function useAuthentication() {
+  const [user, setUser] = useRecoilState(userState)
+
+  useEffect(() => {
+    if (user !== null) {
+      return
     }
-    // ...
-  })
-}
+    firebase
+      .auth()
+      .signInAnonymously()
+      .catch(function (error) {
+        console.error(error)
+      })
 
-if (process.browser) {
-  authenticate()
+    firebase.auth().onAuthStateChanged(function (firebaseUser) {
+      if (firebaseUser) {
+        console.log(firebaseUser);
+        setUser({
+          uid: firebaseUser.uid,
+          isAnonymous: firebaseUser.isAnonymous,
+        })
+      } else {
+        setUser(null)
+      }
+    })
+  }, [])
+
+  return { user }
 }
