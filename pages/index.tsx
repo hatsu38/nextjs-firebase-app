@@ -18,8 +18,11 @@ export default function Home() {
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
-        <h2>{user?.uid || '未ログイン'}</h2>
-
+        <h2>
+          <Link href={`/users/${user?.uid }`} key={user?.uid }>
+            <a>{user?.uid || '未ログイン'}</a>
+          </Link>
+        </h2>
         <Link href="page2"><a>Go to page2</a></Link>
 
         <p className={styles.description}>
