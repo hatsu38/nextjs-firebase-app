@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import firebase from 'firebase/app'
 import { Question } from '../../models/Question'
 import Layout from '../../components/Layout'
@@ -7,35 +7,23 @@ import dayjs from 'dayjs'
 
 export default function QuestionsReceived() {
   const [questions, setQuestions] = useState<Question[]>([])
+  const [isPaginationFinished, setIsPaginationFinished] = useState(false)
   const { user } = useAuthentication()
+  const scrollContainerRef = useRef(null)
 
   useEffect(() => {
-    if (!process.browser) {
-      return
-    }
-    if (user === null) {
-      return
-    }
+    if (!process.browser) { return }
+    if (user === null) { return }
+
     loadQuestions()
   }, [process.browser, user])
 
-  async function loadQuestions() {
-    const snapshot = await createBaseQuery().get()
-
-    if(snapshot.empty) {
-      return
+  useEffect(() => {
+    window.addEventListener('scroll', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
     }
-    appendQuestions(snapshot)
-  }
-
-  function createBaseQuery() {
-    return firebase
-      .firestore()
-      .collection('questions')
-      .where('receiverUid', '==', user.uid)
-      .orderBy('createdAt', 'desc')
-      .limit(10)
-  }
+  }, [questions, scrollContainerRef.current, isPaginationFinished])
 
   function appendQuestions(
     snapshot: firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>
@@ -48,6 +36,16 @@ export default function QuestionsReceived() {
     setQuestions(questions.concat(gotQuestions))
   }
 
+  async function loadQuestions() {
+    const snapshot = await createBaseQuery().get()
+
+    if (snapshot.empty) {
+      setIsPaginationFinished(true)
+      return
+    }
+    appendQuestions(snapshot)
+  }
+
   async function loadNextQuestions() {
     if (questions.length === 0) {
       return
@@ -57,16 +55,44 @@ export default function QuestionsReceived() {
       .startAfter(lastQuestion.createdAt)
       .get()
     if (snapshot.empty) {
+      setIsPaginationFinished(true)
       return
     }
     appendQuestions(snapshot)
+  }
+
+  function createBaseQuery() {
+    return firebase
+      .firestore()
+      .collection('questions')
+      .where('receiverUid', '==', user.uid)
+      .orderBy('createdAt', 'desc')
+      .limit(7)
+  }
+
+  function onScroll() {
+    if (isPaginationFinished) {
+      return
+    }
+
+    const container = scrollContainerRef.current
+    if (container == null) {
+      return
+    }
+
+    const rect = container.getBoundingClientRect()
+    if (rect.top + rect.height > window.innerHeight) {
+      return
+    }
+
+    loadNextQuestions()
   }
 
   return (
     <Layout>
       <h1 className="h4">受け取った質問一覧</h1>
       <div className="row justify-content-center">
-        <div className="col-12 col-md-6">
+        <div className="col-12 col-md-6" ref={scrollContainerRef}>
           {questions.map((question) => (
             <div className="card my-3" key={question.id}>
               <div className="card-body">
