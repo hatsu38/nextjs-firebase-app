@@ -68,6 +68,11 @@ export default function UserShow() {
     <Layout>
       {user && (
         <div className="text-center">
+          <p>
+            <Link href="/users/me">
+              <a className="btn btn-link">自分もみんなに質問してもらおう！</a>
+            </Link>
+          </p>
           <h1 className="h4">{user.name}さんのページ</h1>
           <div className="m-5">{user.name}さんに質問しよう！</div>
           <div className="row justify-content-center mb-3">
