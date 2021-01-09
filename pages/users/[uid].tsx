@@ -5,6 +5,7 @@ import firebase from 'firebase/app'
 import { toast } from 'react-toastify';
 
 import Layout from '../../components/Layout'
+import Questions from '../../components/Questions'
 
 type Query = {
   uid: string
@@ -93,6 +94,7 @@ export default function UserShow() {
               </form>
             </div>
           </div>
+          <Questions user={user} />
         </div>
       )}
     </Layout>
