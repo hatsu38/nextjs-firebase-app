@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import firebase from 'firebase/app'
 import Layout from '../../components/Layout'
 import { Question } from '../../models/Question'
@@ -38,7 +39,7 @@ export default function QuestionsShow() {
 
     const answerSnapshot = await firebase
       .firestore()
-      .collection('answeres')
+      .collection('answers')
       .where('questionId', '==', gotQuestion.id)
       .limit(1)
       .get()
@@ -89,8 +90,7 @@ export default function QuestionsShow() {
     if (user === null) { return }
 
     loadData()
-  }, [query.id])
-
+  }, [query.id, user])
   return (
     <Layout>
       <div className="row justify-content-center mb-3">
@@ -129,7 +129,11 @@ export default function QuestionsShow() {
                 </form>
               ) : (
                 <div className="card">
-                  <div className="card-body text-left">{answer.body}</div>
+                  <div className="card-body text-left">
+                    <Link href={`/answers/${answer.id}`} key={answer.id}>
+                      <a>{answer.body}</a>
+                    </Link>
+                  </div>
                 </div>
               )}
             </section>

@@ -60,7 +60,6 @@ export default function QuestionsReceived({user}) {
   }
 
   function createBaseQuery() {
-    console.log("user", user)
     return firebase
       .firestore()
       .collection('questions')
