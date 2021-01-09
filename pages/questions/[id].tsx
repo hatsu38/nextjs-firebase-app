@@ -55,8 +55,9 @@ export default function QuestionsShow() {
     e.preventDefault()
     setIsSending(true)
 
+    const answerRef = firebase.firestore().collection('answers').doc()
     await firebase.firestore().runTransaction(async (t) => {
-      t.set(firebase.firestore().collection('answers').doc(), {
+      t.set(answerRef, {
         uid: user.uid,
         questionId: question.id,
         body,
