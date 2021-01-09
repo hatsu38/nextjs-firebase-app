@@ -5,6 +5,7 @@ import Layout from '../../components/Layout'
 import { Question } from '../../models/Question'
 import { Answer } from '../../models/Answer'
 import { useAuthentication } from '../../hooks/authentication'
+import { toast } from 'react-toastify';
 
 type Query = {
   id: string
@@ -73,9 +74,20 @@ export default function QuestionsShow() {
       body,
       createdAt: new firebase.firestore.Timestamp(now / 1000, now % 1000),
     })
+    toast.success('回答しました。', {
+      position: 'bottom-left',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    })
   }
 
   useEffect(() => {
+    if (user === null) { return }
+
     loadData()
   }, [query.id])
 
