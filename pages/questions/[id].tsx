@@ -38,7 +38,7 @@ export default function QuestionsShow() {
 
     const answerSnapshot = await firebase
       .firestore()
-      .collection('answeres')
+      .collection('answers')
       .where('questionId', '==', gotQuestion.id)
       .limit(1)
       .get()
@@ -89,8 +89,7 @@ export default function QuestionsShow() {
     if (user === null) { return }
 
     loadData()
-  }, [query.id])
-
+  }, [query.id, user])
   return (
     <Layout>
       <div className="row justify-content-center mb-3">
