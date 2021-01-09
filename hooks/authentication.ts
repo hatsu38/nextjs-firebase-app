@@ -1,6 +1,6 @@
 import firebase from 'firebase/app'
 import { useEffect } from 'react'
-import { User } from '../modules/User'
+import { User } from '../models/User'
 import { atom, useRecoilState } from 'recoil'
 
 const userState = atom<User>({

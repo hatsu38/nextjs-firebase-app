@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { FormEvent, useEffect, useState } from 'react'
-import { User } from '../../modules/User'
+import { User } from '../../models/User'
 import firebase from 'firebase/app'
 import { toast } from 'react-toastify';
 
