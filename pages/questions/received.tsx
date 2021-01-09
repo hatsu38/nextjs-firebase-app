@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
 import firebase from 'firebase/app'
 import { Question } from '../../models/Question'
 import Layout from '../../components/Layout'
@@ -94,14 +95,18 @@ export default function QuestionsReceived() {
       <div className="row justify-content-center">
         <div className="col-12 col-md-6" ref={scrollContainerRef}>
           {questions.map((question) => (
-            <div className="card my-3" key={question.id}>
-              <div className="card-body">
-                <div className="text-truncate">{question.body}</div>
-              </div>
-              <div className="text-muted text-end">
-                <small>{dayjs(question.createdAt.toDate()).format('YYYY/MM/DD HH:mm')}</small>
-              </div>
-            </div>
+            <Link href={`/questions/${question.id}`} key={question.id}>
+              <a>
+                <div className="card my-3" key={question.id}>
+                  <div className="card-body">
+                    <div className="text-truncate">{question.body}</div>
+                  </div>
+                  <div className="text-muted text-end">
+                    <small>{dayjs(question.createdAt.toDate()).format('YYYY/MM/DD HH:mm')}</small>
+                  </div>
+                </div>
+              </a>
+            </Link>
           ))}
         </div>
       </div>
