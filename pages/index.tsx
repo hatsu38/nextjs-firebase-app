@@ -23,7 +23,6 @@ export default function Home() {
             <a>{user?.uid || '未ログイン'}</a>
           </Link>
         </h2>
-        <Link href="page2"><a>Go to page2</a></Link>
 
         <p className={styles.description}>
           Get started by editing{' '}
