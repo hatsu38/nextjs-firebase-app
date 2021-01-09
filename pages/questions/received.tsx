@@ -3,8 +3,9 @@ import firebase from 'firebase/app'
 import { Question } from '../../models/Question'
 import Layout from '../../components/Layout'
 import { useAuthentication } from '../../hooks/authentication'
+import dayjs from 'dayjs'
 
-export default function QUestionsReceived() {
+export default function QuestionsReceived() {
   const [questions, setQuestions] = useState<Question[]>([])
   const { user } = useAuthentication()
 
@@ -15,25 +16,51 @@ export default function QUestionsReceived() {
     if (user === null) {
       return
     }
-
-    async function loadQuestions() {
-      const snapshot = await firebase
-        .firestore()
-        .collection('questions')
-        .where('receiverUid', '==', user.uid)
-        .get()
-      if (snapshot.empty) {
-        return
-      }
-      const getQuestions = snapshot.docs.map((doc) => {
-        const question = doc.data() as Question
-        question.id = doc.id
-        return question
-      })
-      setQuestions(getQuestions)
-    }
     loadQuestions()
   }, [process.browser, user])
+
+  async function loadQuestions() {
+    const snapshot = await createBaseQuery().get()
+
+    if(snapshot.empty) {
+      return
+    }
+    appendQuestions(snapshot)
+  }
+
+  function createBaseQuery() {
+    return firebase
+      .firestore()
+      .collection('questions')
+      .where('receiverUid', '==', user.uid)
+      .orderBy('createdAt', 'desc')
+      .limit(10)
+  }
+
+  function appendQuestions(
+    snapshot: firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>
+  ) {
+    const gotQuestions = snapshot.docs.map((doc) => {
+      const question = doc.data() as Question
+      question.id = doc.id
+      return question
+    })
+    setQuestions(questions.concat(gotQuestions))
+  }
+
+  async function loadNextQuestions() {
+    if (questions.length === 0) {
+      return
+    }
+    const lastQuestion = questions[questions.length - 1]
+    const snapshot = await createBaseQuery()
+      .startAfter(lastQuestion.createdAt)
+      .get()
+    if (snapshot.empty) {
+      return
+    }
+    appendQuestions(snapshot)
+  }
 
   return (
     <Layout>
@@ -44,6 +71,9 @@ export default function QUestionsReceived() {
             <div className="card my-3" key={question.id}>
               <div className="card-body">
                 <div className="text-truncate">{question.body}</div>
+              </div>
+              <div className="text-muted text-end">
+                <small>{dayjs(question.createdAt.toDate()).format('YYYY/MM/DD HH:mm')}</small>
               </div>
             </div>
           ))}
