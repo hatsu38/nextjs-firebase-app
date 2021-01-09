@@ -50,7 +50,7 @@ export default function QuestionsShow() {
     setAnswer(gotAnswer)
   }
 
-  async function onSubmit(e: FormEvent<HTMLFontElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsSending(true)
 
